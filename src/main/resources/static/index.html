@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@500&display=swap" rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+            integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
+            integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF"
+            crossorigin="anonymous"></script>
+
+    <!-- fontawesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/css/all.min.css"/>
+
+</head>
+
+<style>
+    .content-header {
+        height: 8vh;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #457ccc;
+        font-size: 1.2rem;
+        font-weight: 900;
+    }
+
+    .content-header button {
+        font-size: 1rem;
+        font-weight: 900;
+    }
+
+    .content-body {
+        height: 92vh;
+        overflow: auto;
+        background: #ebebeb;
+    }
+    .card {
+        box-shadow: 0 4px 25px 0 rgb(0 0 0 / 15%) !important;
+    }
+</style>
+
+<body>
+
+<div class="content-header px-4">
+    <span class="text-white">TODAY MEMO</span>
+    <button type="button" class="btn btn-outline-secondary text-white" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@mdo">
+        MEMO
+    </button>
+</div>
+
+<!-- MODAL -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="exampleModalLabel">New Memo</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-2">
+                        <label for="username" class="col-form-label">작성자</label>
+                        <input type="text" class="form-control" id="username" autocomplete="off">
+                    </div>
+                    <div class="mb-2">
+                        <label for="title" class="col-form-label">제목</label>
+                        <input type="text" class="form-control" id="title" autocomplete="off">
+                    </div>
+                    <div class="mb-2">
+                        <label for="content" class="col-form-label">내용</label>
+                        <textarea class="form-control" id="content" col="10"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary w-100" onclick="writeMemo()">저장</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- // MODAL -->
+
+<div class="content-body w-100">
+    <div class="col-lg-8 p-3 bg-white h-100 m-auto overflow-auto">
+
+        <div class="album py-3">
+            <div>
+
+                <div id="contents" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+
+                </div>
+
+                <div id="contents2" class="d-none">
+                    상세페이지
+                    <button class="btn btn-outline-warning" type="button" onclick="goList()">
+                        리스트로
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        getMemos();
+    })
+
+    function getMemos() {
+        $('#contents').empty();
+        $.ajax({
+            type: 'GET',
+            url: '/api/memos',
+            success: function (res) {
+                for (let i = 0; i < res.length; i++) {
+                    let memo = res[i];
+                    let id = memo['id'];
+                    let username = memo['username'];
+                    let title = memo['title']
+                    let content = memo['content'];
+                    let modifiedAt = memo['modifiedAt'];
+
+                    let temp = `<div class="card-wrapper">
+                                <div class="card shadow-sm">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between my-2">
+                                            <div class="text-primary">제목</div>
+                                            <div>${title}</div>
+                                        </div>
+                                        <div class="d-flex justify-content-between my-2">
+                                            <div class="text-primary">작성자</div>
+                                            <div>${username}</div>
+                                        </div>
+                                        <div class="d-flex justify-content-between my-2">
+                                            <div class="text-primary">작성일</div>
+                                            <div>${modifiedAt}</div>
+                                        </div>
+                                        <br>
+                                        <div>
+                                            <button type="button" class="mb-2 btn btn-outline-primary w-100" onclick="goPage(${id})">
+                                                자세히
+                                            </button>
+                                            <button type="button" class="btn btn-outline-dark w-100" onclick="deleteMemo('${id}')">
+                                                삭제
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                    `;
+                    $('#contents').append(temp);
+                }
+            }
+        })
+    }
+
+    function writeMemo() {
+        let username = $('#content').val();
+        let title = $('#title').val();
+        let content = $('#content').val();
+
+        if (username == '' || title == '' || content == '') {
+            alert('유효한 양식이 아닙니다. 공백을 제거해주세요.');
+            return;
+        }
+        if (title.trim().length > 50) {
+            alert('유효한 양식이 아닙니다. 50자 이하의 제목을 입력해주세요.');
+        }
+        if (content.trim().length > 150) {
+            alert('유효한 양식이 아닙니다. 150자 이하의 내용을 입력해주세요.');
+            return;
+        }
+        let data = {
+            'username': username,
+            'title': title,
+            'content': content
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: '/api/memos',
+            contentType: "application/json",
+            data: JSON.stringify(data),
+            success: function(res) {
+                // alert('저장 완료');
+                location.reload();
+            }
+        })
+    }
+
+    function goPage(_id) {
+        location.href = "/memo/"+_id;
+    }
+
+
+    function goList() {
+        $('#contents').removeClass('d-none');
+        $('#contents2').addClass('d-none');
+    }
+
+    function deleteMemo(id) {
+        $.ajax({
+            type: "DELETE",
+            url: `/api/memos/${id}`,
+            success: function (res) {
+                alert("삭제 성공");
+                location.reload();
+            }
+        })
+    }
+
+
+
+</script>
+
+</body>
+
+</html>
