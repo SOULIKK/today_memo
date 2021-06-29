@@ -47,7 +47,7 @@
     .content-body {
         height: 92vh;
         overflow: auto;
-        background: #ebebeb;
+        background: #f5f5f5;
     }
 
     .card {
@@ -73,7 +73,7 @@
 
         <div class="album py-3">
             <div>
-                <div id="contents" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+                <div id="contents" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 p-3">
 
                 </div>
             </div>
@@ -90,20 +90,21 @@
             type: 'GET',
             url: `/api/memo/${id}`,
             success: function (res) {
+                let modifiedAt = res.modifiedAt.substring(5, 10) + ' ' +res.modifiedAt.substring(11, 16);
 
                 let temp = `<div id="detailMemoForm" class="m-auto w-100">
-                                <h3 class="text-center my-3 fw-bold">${res.title}</h3>
+                                <h1 class="text-center my-4 fw-bold text-primary">${res.title}</h1>
                                 <h5 class="text-right d-flex my-2 justify-content-between">
-                                    <div>${res.username}</div>
-                                    <div>${res.modifiedAt}</div>
+                                    <div>작성자 : <span class="fw-bold">${res.username}</span></div>
+                                    <div>${modifiedAt} 작성</div>
                                 </h5>
                                 <br>
                                 <div class="border border-secondary bg-white p-3 detail-content">
                                     ${res.content}
                                 </div>
                                 <div class="my-3 d-flex justify-content-between">
-                                    <button type="button" class="btn btn-warning" onclick="getUpdateMemoForm(${id}, ${res.username}, ${res.title}, ${res.content})">수정</button>
-                                    <button type="button" class="btn btn-outline-dark float-right" onclick="delMemo(${id})">
+                                    <button type="button" class="btn btn-outline-dark" onclick="getUpdateMemoForm(${id}, '${res.username}', '${res.title}', '${res.content}')">수정</button>
+                                    <button type="button" class="btn btn-dark float-right" onclick="delMemo(${id})">
                                         삭제
                                     </button>
                                 </div>
@@ -121,25 +122,35 @@
             url: `/api/memos/${id}`,
             success: function (res) {
                 alert("삭제 완료");
-                location.href('/api/memos');
+                location.href = '/';
             }
         })
     }
 
-    function getUpdateMemoForm(_id, _user, title, _content) {
+    function getUpdateMemoForm(_id, _user, _title, _content) {
+
         $("#contents").empty();
         let updateForm = `<div id="detailMemoForm" class="m-auto w-100">
+                                <h2 class="my-1 text-primary text-center">UPDATE MEMO</h2>
                                 <input type="hidden" id="memoId" value="${_id}">
-                                <h3 class="text-center my-3 fw-bold">
-                                    <input class="form-control" type="text" id="title" value="_">
-                                </h3>
-                                <h5 class="text-right d-flex my-2 justify-content-between">
-                                    <div>${_user}</div>
-                                </h5>
                                 <br>
-                                <textarea class="form-control w-100" id="memoContent" rows="8">${_content}</textarea>
                                 <div class="my-3">
-                                    <button type="button" class="btn btn-primary w-100" onclick=""> 저장</button>
+                                    <label>제목</label>
+                                    <input class="form-control" type="text" id="memoTitle" value="${_title}">
+                                </div>
+
+                                <div class="my-3">
+                                    <label>작성자</label>
+                                    <input class="form-control" id="memoUsername" type="text" value="${_user}" readonly>
+                                </div>
+
+                                <div class="my-3">
+                                    <label>내용</label>
+                                    <textarea class="form-control w-100" id="memoContent" rows="8">${_content}</textarea>
+                                </div>
+
+                                <div class="my-3">
+                                    <button type="button" class="btn btn-primary w-100" onclick="updateMemo(${_id})"> 저장</button>
                                 </div>
                             </div>
 
@@ -147,9 +158,32 @@
         $("#contents").append(updateForm);
     }
 
-    function updateMemo() {
-        let id = $("#memoId").val();
+    function updateMemo(_id) {
+
+        let title = $("#memoTitle").val();
         let content = $("#memoContent").val();
+        let username = $("#memoUsername").val();
+
+        if (title == '' || content == '') {
+            alert('공백값을 넣을 수 없습니다.');
+            return false;
+        }
+        let data = {
+            'title': title,
+            'content': content,
+            'username': username
+        };
+
+        $.ajax({
+            type: "PUT",
+            url: `/api/update/${_id}`,
+            contentType: "application/json",
+            data: JSON.stringify(data),
+            success: function (response) {
+                alert('수정 완료');
+                window.location.reload();
+            }
+        });
     }
 
 </script>

@@ -26,7 +26,7 @@ public class MemoController {
         return memoRepository.findAllByModifiedAtBetweenOrderByModifiedAtDesc(yesterday, now);
     }
 
-    // 상세페이지
+    // 상세페이지 조회
     @GetMapping("/api/memo/{id}")
     public Optional<Memo> getMemo(@PathVariable Long id) {
         return memoRepository.findById(id);
@@ -39,17 +39,20 @@ public class MemoController {
         return memoRepository.save(memo);
     }
 
+    // 수정
     @PutMapping("/api/update/{id}")
     public Long updateMemo(@PathVariable Long id, @RequestBody MemoRequestDto requestDto) {
         memoService.update(id, requestDto);
         return id;
     }
 
+    // 삭제
     @DeleteMapping("/api/memos/{id}")
     public Long deleteMemo(@PathVariable Long id) {
         memoRepository.deleteById(id);
         return id;
     }
+
 
 
 }

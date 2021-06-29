@@ -47,7 +47,7 @@
     .content-body {
         height: 92vh;
         overflow: auto;
-        background: #ebebeb;
+        background: #f5f5f5;
     }
     .card {
         box-shadow: 0 4px 25px 0 rgb(0 0 0 / 15%) !important;
@@ -68,22 +68,22 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h6 class="modal-title" id="exampleModalLabel">New Memo</h6>
+                <h6 class="modal-title" id="exampleModalLabel">NEW MEMO</h6>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form>
                     <div class="mb-2">
-                        <label for="username" class="col-form-label">작성자</label>
+                        <label for="username" class="col-form-label text-primary">작성자</label>
                         <input type="text" class="form-control" id="username" autocomplete="off">
                     </div>
                     <div class="mb-2">
-                        <label for="title" class="col-form-label">제목</label>
+                        <label for="title" class="col-form-label text-primary">제목</label>
                         <input type="text" class="form-control" id="title" autocomplete="off">
                     </div>
                     <div class="mb-2">
-                        <label for="content" class="col-form-label">내용</label>
-                        <textarea class="form-control" id="content" col="10"></textarea>
+                        <label for="content" class="col-form-label text-primary">내용</label>
+                        <textarea class="form-control" id="content" col="12"></textarea>
                     </div>
                 </form>
             </div>
@@ -96,20 +96,13 @@
 <!-- // MODAL -->
 
 <div class="content-body w-100">
-    <div class="col-lg-8 p-3 bg-white h-100 m-auto overflow-auto">
+    <div class="col-lg-8 p-3 bg-white h-100 m-auto overflow-auto p-3">
 
         <div class="album py-3">
             <div>
 
-                <div id="contents" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+                <div id="contents" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 p-3">
 
-                </div>
-
-                <div id="contents2" class="d-none">
-                    상세페이지
-                    <button class="btn btn-outline-warning" type="button" onclick="goList()">
-                        리스트로
-                    </button>
                 </div>
 
             </div>
@@ -134,35 +127,32 @@
                     let id = memo['id'];
                     let username = memo['username'];
                     let title = memo['title']
-                    let modifiedAt = memo['modifiedAt'];
+                    let modifiedAt = memo['modifiedAt'].substring(5, 10) + ' ' +memo['modifiedAt'].substring(11, 16);
 
                     let temp = `<div class="card-wrapper">
-                                <div class="card shadow-sm">
-                                    <div class="card-body">
-                                        <div class="d-flex justify-content-between my-2">
-                                            <div class="text-primary">제목</div>
-                                            <div>${title}</div>
-                                        </div>
-                                        <div class="d-flex justify-content-between my-2">
-                                            <div class="text-primary">작성자</div>
-                                            <div>${username}</div>
-                                        </div>
-                                        <div class="d-flex justify-content-between my-2">
-                                            <div class="text-primary">작성일</div>
-                                            <div>${modifiedAt}</div>
-                                        </div>
-                                        <br>
-                                        <div>
-                                            <button type="button" class="mb-2 btn btn-outline-primary w-100" onclick="getDetailPage(${id})">
-                                                자세히
-                                            </button>
-                                            <button type="button" class="btn btn-outline-dark w-100" onclick="deleteMemo('${id}')">
-                                                삭제
-                                            </button>
+                                    <div class="card shadow-sm">
+                                        <div class="card-body">
+                                            <h3 class="text-center fw-bold mb-3">${title}</h3>
+                                            <div class="d-flex justify-content-between my-2">
+                                                <div class="text-primary">작성자</div>
+                                                <div class="fw-bold">${username}</div>
+                                            </div>
+                                            <div class="d-flex justify-content-between my-2">
+                                                <div class="text-primary">작성일</div>
+                                                <div class="fw-bold">${modifiedAt}</div>
+                                            </div>
+                                            <div class="d-flex justify-content-between mt-2">
+                                                <button type="button" class="btn btn-dark w-100" onclick="deleteMemo('${id}')">
+                                                    삭제
+                                                </button>
+                                                &nbsp;
+                                                <button type="button" class="btn btn-outline-primary w-100" onclick="getDetailPage(${id})">
+                                                    자세히
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
                     `;
                     $('#contents').append(temp);
                 }
@@ -171,7 +161,7 @@
     }
 
     function writeMemo() {
-        let username = $('#content').val();
+        let username = $('#username').val();
         let title = $('#title').val();
         let content = $('#content').val();
 
@@ -204,12 +194,9 @@
         })
     }
 
-    // function getDetailPage(_id) {
-    //     location.href = "/api/memo/"+_id;
-    // }
 
     function getDetailPage(_id) {
-        alert(_id);
+        // alert(_id);
         $.ajax({
             type: 'GET',
             url: `/api/memo/${_id}`,
