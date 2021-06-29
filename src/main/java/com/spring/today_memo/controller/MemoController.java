@@ -5,12 +5,11 @@ import com.spring.today_memo.domain.MemoRepository;
 import com.spring.today_memo.domain.MemoRequestDto;
 import com.spring.today_memo.service.MemoService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @RestController
@@ -27,6 +26,11 @@ public class MemoController {
         return memoRepository.findAllByModifiedAtBetweenOrderByModifiedAtDesc(yesterday, now);
     }
 
+    // 상세페이지
+    @GetMapping("/api/memo/{id}")
+    public Optional<Memo> getMemo(@PathVariable Long id) {
+        return memoRepository.findById(id);
+    }
 
     // 작성
     @PostMapping("/api/memos")
